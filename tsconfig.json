@@ -5,13 +5,13 @@
 
     "module": "commonjs",
     "rootDir": "src",
+    "declaration": true,
 
     "outDir": "./dist",
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
 
     "strict": true,
-    "noImplicitAny": true,
-    "skipLibCheck": true
+    "noImplicitAny": true
   }
 }

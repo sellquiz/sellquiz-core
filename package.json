@@ -2,10 +2,16 @@
   "name": "sellquiz-core",
   "version": "0.0.1",
   "description": "",
-  "main": "index.ts",
+  "main": "./dist/index.js",
   "scripts": {
-    "test": "jest --colors --config jest-unit.config.js"
+    "test": "jest --colors --config jest-unit.config.js",
+    "test:watch": "jest --watch --config jest-unit.config.js",
+    "build": "tsc"
   },
+  "files": [
+    "dist",
+    "LICENSE"
+  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/sellquiz/sellquiz-core.git"
