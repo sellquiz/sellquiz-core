@@ -4,8 +4,5 @@
 
 ### Run tests once
 
-`npm test`
-
-### Run Test in watch mode
-
-`jest --watch --config jest-unit.config.js`
+Once: `npm test`  
+Watch: `npm run-script test:watch`
