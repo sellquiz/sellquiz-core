@@ -1,5 +1,10 @@
-import { createQuestion, evaluateQuestion } from './index';
-import { Question, VariableTypes } from './types';
+import {
+  createQuestion,
+  evaluateQuestion,
+  getAnswers,
+  validate,
+} from './index';
+import { Question, QuestionWithAnswers, VariableTypes } from './types';
 
 const sellCode = `Mengen
 
@@ -17,7 +22,7 @@ const question: Question = {
   variables: [{ name: 'a', type: VariableTypes.Number, value: '1' }],
 };
 
-const questionWithAnswers: Question = {
+const questionWithAnswers: QuestionWithAnswers = {
   ...question,
   answer: [{ name: 'a', value: '1' }],
 };
@@ -33,5 +38,17 @@ describe('sellcode to sellobject', () => {
     const output = evaluateQuestion(questionWithAnswers);
 
     expect(output).toEqual(0.42);
+  });
+
+  it('validates sellCode', () => {
+    const output = validate(sellCode);
+
+    expect(output).toEqual(true);
+  });
+
+  it('gets ansers for a question', () => {
+    const output = getAnswers(question);
+
+    expect(output).toEqual([{ name: 'a', value: '1' }]);
   });
 });

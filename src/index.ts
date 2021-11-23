@@ -1,5 +1,10 @@
-import { Question, VariableTypes } from './types';
+import { Answer, Question, QuestionWithAnswers, VariableTypes } from './types';
 
+/**
+ * Creates a new question from sellCode
+ * @param sellCode
+ * @returns Question without answers
+ */
 export function createQuestion(sellCode: string): Question {
   console.log(sellCode);
 
@@ -27,7 +32,35 @@ export function createQuestion(sellCode: string): Question {
   return question;
 }
 
-export function evaluateQuestion(question: Question): number {
+/**
+ * Get answers for a question
+ * @param question
+ * @returns
+ */
+export function getAnswers(question: Question): Answer[] {
+  console.log('Get answers for: ', question.title);
+  const answers: Answer[] = [{ name: 'a', value: '1' }];
+  return answers;
+}
+
+/**
+ * Checks if the given sellCode is valid
+ * @param sellCode string containing sell code
+ */
+export function validate(sellCode: string): boolean {
+  console.log('Validate Code: ', sellCode);
+  // TODO: validate sellCode
+
+  // Return boolean for now. In the future, we should return an error message
+  return true;
+}
+
+/**
+ * Evaluates answer for a question
+ * @param question question object with answers
+ * @returns score
+ */
+export function evaluateQuestion(question: QuestionWithAnswers): number {
   if (!question.answer) {
     throw new Error('No answer given');
   }

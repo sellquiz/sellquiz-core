@@ -8,7 +8,10 @@ export interface Question {
   body: string;
   code: string;
   variables: Variable[];
-  answer?: Answer[];
+}
+
+export interface QuestionWithAnswers extends Question {
+  answer: Answer[];
 }
 
 export interface Variable {
