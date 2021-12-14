@@ -46,7 +46,7 @@ describe('sellcode to sellobject', () => {
     expect(output).toEqual(true);
   });
 
-  it('gets ansers for a question', () => {
+  it('gets answers for a question', () => {
     const output = getAnswers(question);
 
     expect(output).toEqual([{ name: 'a', value: '1' }]);

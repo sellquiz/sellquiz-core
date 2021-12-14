@@ -1,5 +1,7 @@
 import { Answer, Question, QuestionWithAnswers, VariableTypes } from './types';
 
+import { SellQuiz } from './interpreter/quiz';
+
 /**
  * Creates a new question from sellCode
  * @param sellCode
@@ -9,6 +11,18 @@ export function createQuestion(sellCode: string): Question {
   console.log(sellCode);
 
   // TODO: generate question from sellcode
+
+  const sellQuiz = new SellQuiz();
+  if(sellQuiz.importQuestion(sellCode) == false) {
+    // TODO: error handling
+  }
+  const question: Question = {
+    title: sellQuiz.getTitle(),
+    body: sellQuiz.getBodyHtml(),
+    code: sellCode,
+    variables: sellQuiz.getVariables()
+  }
+
 
   /* example:
     const sellQuestion = sell.parse(sellcode);
@@ -23,12 +37,12 @@ export function createQuestion(sellCode: string): Question {
 
    */
 
-  const question: Question = {
+  /*const question: Question = {
     title: 'Test 1',
     body: '<div> Sell Frage HTML </div>',
     code: sellCode,
     variables: [{ name: 'a', type: VariableTypes.Number, value: '1' }],
-  };
+  };*/
   return question;
 }
 

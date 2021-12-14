@@ -12,6 +12,14 @@
     "forceConsistentCasingInFileNames": true,
 
     "strict": true,
-    "noImplicitAny": true
-  }
+    "noImplicitAny": true,
+
+    "strictNullChecks": false,  // TODO!!
+  },
+  "include": [
+    "src/**/*.ts"
+  ],
+  "exclude": [
+    "src/todo_or_old/*"
+  ]
 }
