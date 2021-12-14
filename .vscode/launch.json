@@ -11,10 +11,10 @@
             "skipFiles": [
                 "<node_internals>/**"
             ],
-            "program": "${workspaceFolder}/dist/temp_test.js",
+            "program": "${workspaceFolder}/src/temp_test.ts",
             "sourceMaps": true,
             "protocol": "inspector",
-            "preLaunchTask": "tsc: build - tsconfig.json"
+            "preLaunchTask": "tsc: build - tsconfig.json",
         }
     ]
 }
