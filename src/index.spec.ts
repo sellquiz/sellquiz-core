@@ -1,10 +1,10 @@
 import {
   createQuestion,
   evaluateQuestion,
-  getAnswers,
+  getCalculatedAnswers,
   validate,
 } from './index';
-import { Question, QuestionWithAnswers, VariableTypes } from './types';
+import { Question, QuestionWithAnswers, VariableType } from './types';
 
 const sellCode = `Mengen
 
@@ -19,12 +19,13 @@ const question: Question = {
   title: 'Test 1',
   body: '<div> Sell Frage HTML </div>', //TODO: check real html
   code: sellCode,
-  variables: [{ name: 'a', type: VariableTypes.Number, value: '1' }],
+  variables: [{ name: 'a', type: VariableType.Scalar, value: '1' }],
+  inputs: [] // TODO
 };
 
 const questionWithAnswers: QuestionWithAnswers = {
   ...question,
-  answer: [{ name: 'a', value: '1' }],
+  answers: [{ name: 'a', value: '1' }],
 };
 
 describe('sellcode to sellobject', () => {
@@ -47,7 +48,7 @@ describe('sellcode to sellobject', () => {
   });
 
   it('gets answers for a question', () => {
-    const output = getAnswers(question);
+    const output = getCalculatedAnswers(question);
 
     expect(output).toEqual([{ name: 'a', value: '1' }]);
   });

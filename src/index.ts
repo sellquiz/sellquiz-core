@@ -1,4 +1,4 @@
-import { Answer, Question, QuestionWithAnswers, VariableTypes } from './types';
+import { Answer, Feedback, Question, QuestionWithAnswers, VariableType } from './types';
 
 import { SellQuiz } from './interpreter/quiz';
 
@@ -8,19 +8,21 @@ import { SellQuiz } from './interpreter/quiz';
  * @returns Question without answers
  */
 export function createQuestion(sellCode: string): Question {
+
   console.log(sellCode);
 
   // TODO: generate question from sellcode
 
-  const sellQuiz = new SellQuiz();
+  const sellQuiz = new SellQuiz();   // TODO: create instance here??
   if(sellQuiz.importQuestion(sellCode) == false) {
-    // TODO: error handling
+    throw new Error('import failed');
   }
   const question: Question = {
     title: sellQuiz.getTitle(),
     body: sellQuiz.getBodyHtml(),
-    code: sellCode,
-    variables: sellQuiz.getVariables()
+    code: sellQuiz.getSellCode(),
+    variables: sellQuiz.getVariables(),
+    inputs: sellQuiz.getInputs()
   }
 
 
@@ -51,9 +53,18 @@ export function createQuestion(sellCode: string): Question {
  * @param question
  * @returns
  */
-export function getAnswers(question: Question): Answer[] {
-  console.log('Get answers for: ', question.title);
-  const answers: Answer[] = [{ name: 'a', value: '1' }];
+export function getCalculatedAnswers(question: Question): Answer[] {
+  console.log('Get calculated answers for: ', question.title);
+  //const answers: Answer[] = [{ name: 'a', value: '1' }];
+  const answers: Answer[] = [];
+  for(const v of question.variables) {
+    if(v.name.startsWith('$$') == false)
+      continue;
+    answers.push({
+      name: v.name,
+      value: v.value
+    })
+  }
   return answers;
 }
 
@@ -74,17 +85,33 @@ export function validate(sellCode: string): boolean {
  * @param question question object with answers
  * @returns score
  */
-export function evaluateQuestion(question: QuestionWithAnswers): number {
-  if (!question.answer) {
+export function evaluateQuestion(question: QuestionWithAnswers): Feedback {
+  if (!question.answers) {
     throw new Error('No answer given');
   }
 
-  // TODO: evaluate question
+  const sellQuiz = new SellQuiz();   // TODO: create instance here??
 
-  /* example:
-    const sellQuestion = sell.fromQuestion(question); // We expect that this question has answers
-    const result = sellQuestion.evaluate();
-  */
-  const result = 0.42;
-  return result;
+  ///* example:
+    //const sellQuestion = sellQuiz.fromQuestion(question); // We expect that this question has answers
+
+    sellQuiz.setTitle(question.title);
+    sellQuiz.setBodyHtml(question.body);
+    if(!sellQuiz.setVariables(question.variables)) {
+      throw new Error('Failed to set variables');
+    }
+    if(!sellQuiz.setInputs(question.inputs)) {
+      throw new Error('Failed to set inputs');
+    }
+    sellQuiz.setSellCode(question.code);
+    if(!sellQuiz.setStudentAnswers(question.answers)) {
+      throw new Error('Failed to set student answers');
+    }
+
+    const feedback = sellQuiz.eval();
+  //*/
+
+  //const result = 0.42;
+
+  return feedback;
 }

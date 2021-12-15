@@ -72,6 +72,19 @@ export class SellSymbol {
         this.hint_html = d["hint"];
     }*/
 
+  fromAsciiMath(am : string) {
+    switch(this.type) {
+      case symtype.T_BOOL:
+        this.value = am === 'true';
+        break;
+      case symtype.T_REAL:
+        this.value = parseFloat(am);
+        break;
+      default:
+        console.log("!!!!TODO: fromAsciiMath(..): unimplemented!");
+    }
+  }
+
   toAsciiMath() {
     let s = '';
     switch (this.type) {

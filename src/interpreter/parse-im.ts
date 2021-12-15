@@ -39,8 +39,10 @@ export class ParseIM {
     html += '` ';
     this.p.terminal('$');
     //this.p.q.html += ' <span style="font-size: 13pt;">' + html.replaceAll('``', '') + '</span> ';
-    this.p.q.html +=
-      ' <span style="font-size: 13pt;">' + html.replace(/``/g, '') + '</span> ';
+    //this.p.q.html +=
+    //  ' <span style="font-size: 13pt;">' + html.replace(/``/g, '') + '</span> ';
+    // TODO: font-size!!!
+    this.p.q.html += html.replace(/``/g, '');
   }
 
   // im_expr =  /*similar to ASCII math*/

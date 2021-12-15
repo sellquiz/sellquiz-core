@@ -161,9 +161,9 @@ export class ParseText {
     this.p.q.solutionSymbols[symId] = sym;
 
     const input = new SellInput();
-    input.htmlElementId = 'sellquiz_input_' + symId;
+    //input.htmlElementId = 'sellquiz_input_' + symId;
     input.solutionVariableId = symId;
-    input.htmlElementId_feedback = 'sellquiz_feedback_' + symId;
+    //input.htmlElementId_feedback = 'sellquiz_feedback_' + symId;
     input.htmlElementInputType = SellInputElementType.CHECKBOX;
     this.p.q.inputs.push(input);
 
@@ -171,17 +171,19 @@ export class ParseText {
     const checked = '';
 
     this.p.q.html += '\n§[';
-    this.p.q.html +=
+    /*this.p.q.html +=
       '<input id="' +
       input.htmlElementId +
       '" type="' +
       inputType +
       '" name="sell_input" ' +
       checked +
-      '/>&nbsp;';
+      '/>&nbsp;';*/
+    this.p.q.html += '$$' + symId + ' ##' + symId;
 
-    this.p.singleMultipleChoiceFeedbackHTML =
-      '&nbsp;<span id="' + input.htmlElementId_feedback + '"></span>\n';
+    // !!!!!TODO!!!!!
+    //this.p.singleMultipleChoiceFeedbackHTML =
+    //  '&nbsp;<span id="' + input.htmlElementId_feedback + '"></span>\n';
   }
 
   // inline_listing =

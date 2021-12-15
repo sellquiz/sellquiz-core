@@ -18,7 +18,8 @@
 
 export function sellassert(cond: boolean, msg = '') {
   // TODO!!!!!
-  console.log(msg);
+  if(!cond)
+    console.log(msg);
   /*if(!cond) {
         console.log(msg);
         if(typeof process !== 'undefined') {

@@ -25,7 +25,7 @@ import { ParseIM } from './parse-im';
 import { ParseIM_Input } from './parse-im-input';
 import { ParseProg } from './parse-prog';
 import { Evaluate } from './../eval/evaluate';
-import { Variable } from '../types';
+import { Variable, VariableType, Input, InputType, Answer, Feedback, FeedbackItem } from '../types';
 //import { MatrixInput } from './matinput';
 //import { getHtmlChildElementRecursive } from './help';
 //import { check_symbol_svg } from './img'
@@ -43,13 +43,13 @@ export enum SellInputElementType {
 }
 
 export class SellInput {
-  htmlElementId = '';
+  //htmlElementId = '';
   htmlElementInputType: SellInputElementType = SellInputElementType.UNKNOWN;
-  htmlElementId_feedback = '';
+  //htmlElementId_feedback = '';
   solutionVariableId = '';
   solutionVariableRef: SellSymbol | null = null;
   // linearized input: one element for scalars, n elemens for vectors, m*n elements for matrices (row-major)
-  studentAnswer: Array<string> = [];
+  studentAnswer: string[] = [];
   evaluationFeedbackStr = '';
   correct = false;
   // only used for matrix based mathtypes
@@ -63,7 +63,6 @@ export class SellInput {
 }
 
 export class SellQuestion {
-  idx = 0;
   src = '';
   html = '';
   titleHtml = '';
@@ -79,6 +78,14 @@ export class SellQuestion {
   generalFeedbackStr = '';
   allAnswersCorrect = false;
   // TODO: move parse method and other methods here
+
+  getInput(name: string) : SellInput {
+    for(const input of this.inputs) {
+      if(input.solutionVariableId === name)
+        return input;
+    }
+    return null;
+  }
 }
 
 export class SellQuiz {
@@ -99,13 +106,13 @@ export class SellQuiz {
   debug = false;
   log = '';
   language = 'en';
-  generateInputFieldHtmlCode = true;
+  generateInputFieldHtmlCode = false;
   servicePath = './services/';
 
   // questions
-  questions: Array<SellQuestion> = [];
-  q: SellQuestion | null = null; // current question
-  qidx = 0; // current question index
+  //questions: Array<SellQuestion> = [];
+  q: SellQuestion = new SellQuestion(); // current question
+  //qidx = 0; // current question index
   html = '';
   variablesJsonStr = ''; // TODO!!
 
@@ -150,20 +157,170 @@ export class SellQuiz {
     this.imParser = new ParseIM(this);
     this.imInputParser = new ParseIM_Input(this);
     this.progParser = new ParseProg(this);
+
+    this.q = new SellQuestion();
   }
 
   getTitle() : string {
-    return this.questions[0].titleHtml;
+    return this.q.titleHtml;
+  }
+
+  setTitle(title : string) {
+    this.q.titleHtml = title;
+  }
+
+  getSellCode() : string {
+    return this.q.src;
+  }
+
+  setSellCode(code : string) {
+    this.q.src = code;
   }
 
   getBodyHtml() : string {
-    return this.questions[0].bodyHtml;
+    return this.q.bodyHtml;
+  }
+
+  setBodyHtml(bodyHtml : string) {
+    this.q.bodyHtml = bodyHtml;
   }
 
   getVariables() : Variable[] {
-    // TODO!!
-    const v : Variable[] = [];
-    return v;
+    // TODO: precision!
+    const vars : Variable[] = [];
+
+    //const allSymbols = Object.assign({}, this.q.symbols, this.q.solutionSymbols);
+    const allSymbols = this.q.symbols;
+    for(const symId in this.q.solutionSymbols) {
+      allSymbols['$$' + symId] = this.q.solutionSymbols[symId];
+    }
+    for(const symId in allSymbols) {
+      const sym = allSymbols[symId];
+      let type : VariableType;
+      switch(sym.type) {
+        case symtype.T_REAL:
+          type = VariableType.Scalar;
+          break;
+        default:
+          // TODO!!
+          type = VariableType.Unimplemented;
+      }
+      const v : Variable = {
+        name: symId,
+        type: type,
+        value: sym.toAsciiMath()
+      }
+      vars.push(v);
+    }
+    return vars;
+  }
+
+  setVariables(vars : Variable[]) : boolean {
+    // TODO: precision!
+    for(const v of vars) {
+      let type : symtype;
+      switch(v.type) {
+        case VariableType.Boolean:
+          type = symtype.T_BOOL;
+          break;
+        case VariableType.Scalar:
+          type = symtype.T_REAL;
+          break;
+        default:
+          // TODO!!
+          return false;
+      }
+      if(v.name.startsWith('$$')) {
+        const name = v.name.substring(2);
+        this.q.solutionSymbols[name] = new SellSymbol(type);
+        this.q.solutionSymbols[name].fromAsciiMath(v.value);
+      } else {
+        this.q.symbols[v.name] = new SellSymbol(type);
+        this.q.symbols[v.name].fromAsciiMath(v.value);
+      }
+    }
+    return true;
+  }
+
+  getInputs() : Input[] {
+    const inputs : Input[] = [];
+    for(const sellInput of this.q.inputs) {
+      let type : InputType;
+      switch(sellInput.htmlElementInputType) {
+        case SellInputElementType.CHECKBOX:
+          type = InputType.Checkbox;
+          break;
+        case SellInputElementType.TEXTFIELD:
+          type = InputType.Textfield;
+          break;
+        default:
+          // TODO!!
+          type = InputType.Unimplemented;
+      }
+      const input : Input = {
+        name: '$$' + sellInput.solutionVariableId,
+        type: type,
+        width: -1  // TODO
+      }
+      inputs.push(input);
+    }
+    return inputs;
+  }
+
+  setInputs(inputs : Input[]) : boolean {
+    for(const input of inputs) {
+      const sellInput = new SellInput();
+      const name = input.name.substring(2); // remove preceding '$$'
+      sellInput.solutionVariableId = name;
+      if(!(name in this.q.solutionSymbols))
+        return false;
+      sellInput.solutionVariableRef = this.q.solutionSymbols[name];
+      this.q.inputs.push(sellInput);
+      let type : SellInputElementType;
+      switch(input.type) {
+        case InputType.Checkbox:
+          type = SellInputElementType.CHECKBOX;
+          break;
+        case InputType.Textfield:
+          type = SellInputElementType.TEXTFIELD;
+          break;
+        default:
+          // TODO
+          return false;
+      }
+      sellInput.htmlElementInputType = type;
+    }
+    return true;
+  }
+
+  setStudentAnswers(answers : Answer[]) : boolean {
+    for(const answer of answers) {
+      const input = this.q.getInput(answer.name.substring(2));
+      if(input == null)
+        return false;
+      input.studentAnswer = [ ''+answer.value ];
+    }
+    return true;
+  }
+
+  eval() : Feedback {
+    if(!this.evaluate.evaluate()) {
+      throw new Error("failed to evaluate");
+    }
+    const feedbackItems : FeedbackItem[] = [];
+    for(const input of this.q.inputs) {
+      const feedbackItem : FeedbackItem = {
+        inputName: '$$' + input.solutionVariableId,
+        text: input.evaluationFeedbackStr
+      }
+      feedbackItems.push(feedbackItem);
+    }
+    const score = this.evaluate.getScore();
+    const feedback : Feedback = {
+      score: score,
+      items: feedbackItems
+    }
+    return feedback;
   }
 
   // TODO:
@@ -174,34 +331,8 @@ export class SellQuiz {
         console.log("ERROR: Obviously your quiz includes a programming task. Please also include sellquiz.ide.min.js in your HTML file");
     }*/
 
-  importQuestions(sellCode: string): boolean {
-    sellCode = sellCode.split('STOP')[0];
-    const sellCodeLines = sellCode.split('\n');
-    let code = '';
-    let codeStartRow = 0;
-    for (let i = 0; i < sellCodeLines.length; i++) {
-      const line = sellCodeLines[i];
-      if (line.startsWith('%%%')) {
-        if (!this.importQuestion(code, codeStartRow)) return false;
-        code = '';
-        codeStartRow = i + 1;
-      } else {
-        code += line + '\n';
-      }
-    }
-    if (!this.importQuestion(code, codeStartRow)) return false;
-    // TODO:
-    /*if(this.environment == "moodle") {
-            for(let i=0; i<this.questions.length; i++) {
-                let q = this.questions[i];
-                this.variablesJsonStr = JSON.stringify({"symbols":q.symbols, "solutionSymbols":q.solutionSymbols}); // TODO: overwritten for every question!!
-                let bp = 1337;
-            }
-        }*/
-    return true;
-  }
-
   importQuestion(src: string, codeStartRow = 0): boolean {
+
     this.resizableRows = false;
     this.resizableCols = false;
 
@@ -213,23 +344,14 @@ export class SellQuiz {
     this.tkIdx = 0;
     this.id = ''; // last identifier
 
-    this.qidx = this.questions.length;
-
     this.q = new SellQuestion();
-    this.q.idx = this.qidx;
     this.q.src = src;
-    this.questions.push(this.q);
+
     const lines = src.split('\n');
-    //let indent1_last = false;
-    //let indent2_last = false;
     let last_indent = 0;
     let code_block = false; // inline code (NOT to be confused with SELL-code)
     for (let i = 0; i < lines.length; i++) {
       if (!code_block && lines[i].startsWith('```')) code_block = true;
-      //let indent2 = lines[i].startsWith('\t\t') || lines[i].startsWith('        ');
-      //let indent1 = lines[i].startsWith('\t') || lines[i].startsWith('    ');
-      //if (indent2)
-      //    indent1 = false;
       let indent = 0;
       if (lines[i].startsWith('\t\t') || lines[i].startsWith('        '))
         indent = 2;
@@ -243,10 +365,6 @@ export class SellQuiz {
       if (lineTokens.length == 0) continue;
       lineTokens.push(new SellToken('§EOL', i + 1, -1)); // end of line
       if (!code_block) {
-        /*if (!indent1 && indent1_last)
-                    this.tokens.push(new SellToken('§CODE_END', i + 1, -1));
-                if (indent1 && !indent1_last)
-                    this.tokens.push(new SellToken('§CODE_START', i + 1, -1));*/
         if (last_indent == 0 && indent == 1)
           this.tokens.push(new SellToken('§CODE_START', i + 1, -1));
         else if (last_indent == 0 && indent == 2) {
@@ -266,8 +384,6 @@ export class SellQuiz {
         this.tokens.push(lineTokens[j]);
         this.tokens[this.tokens.length - 1].line = codeStartRow + i + 1;
       }
-      //indent1_last = indent1;
-      //indent2_last = indent2;
       last_indent = indent;
       if (code_block && lines[i].endsWith('```')) code_block = false;
     }
@@ -468,7 +584,7 @@ export class SellQuiz {
   }
 
   createUniqueID() {
-    return 'ID' + this.uniqueIDCtr++;
+    return '' + this.uniqueIDCtr++;
   }
 
   /*updateMatrixInputs(questionID : number) : boolean {
@@ -662,11 +778,6 @@ export class SellQuiz {
         this.q.html += '</div>\n'; // *** end of card
         this.q.html += '<br/>';
     }*/
-
-  getQuestionByIdx(idx: number): SellQuestion | null {
-    if (idx < 0 || idx >= this.questions.length) return null;
-    return this.questions[idx];
-  }
 
   /*enableInputFields(questionID : number, enable = true) {
         let q = this.getQuestionByIdx(questionID);

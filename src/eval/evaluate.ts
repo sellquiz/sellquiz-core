@@ -46,7 +46,7 @@ export class Evaluate {
 
   // TODO: replace asserts by error log!!
 
-  setStudentAnswerManually(
+  /*setStudentAnswerManually(
     qidx: number,
     solutionVariableId: string,
     answerStr: string,
@@ -77,7 +77,7 @@ export class Evaluate {
         break;
     }
     return true;
-  }
+  }*/
 
   /*
     getStudentAnswers(qidx : number) : boolean {
@@ -188,76 +188,92 @@ export class Evaluate {
         return true;
     }*/
 
-  getScore(qidx: number): number {
+  getScore(): number {
     // TODO: scoring is not yet weighted correctly etc...
-    const q = this.p.questions[qidx];
+    const q = this.p.q;
     if (q == null) return -1;
-    let score = 0.0;
+    let score = 0;
     if (q.inputs.length == 0) return score;
     for (let i = 0; i < q.inputs.length; i++) {
       const input = q.inputs[i];
-      if (input.correct) score += 1.0;
+      if (input.correct) score += 1;
     }
     score /= q.inputs.length;
     return score;
   }
 
-  /*evaluate(qidx : number) : boolean {
-        this.selectedAnySingleChoiceOption = false;
-        this.questionContainsSingleChoice = false;
-        const q = this.p.questions[qidx];
-        if(q == null)
-            return false;
-        this.checkIfAllMultipleChoiceAnswersAreCorrect(q);
-        q.generalFeedbackStr = "";
-        q.allAnswersCorrect = true;
-        for(let i=0; i<q.inputs.length; i++) {
-            const input = q.inputs[i];
-            const v = q.solutionSymbols[input.solutionVariableId];
-            sellassert(v != null, "evaluate(): unknown solution symbol " + input.solutionVariableId + " known solution symbols: " + JSON.stringify(q.solutionSymbols));
-            input.evaluationInProgress = false;
-            switch(v.type) {
-                case symtype.T_BOOL:
-                    this.evaluateBool(q, input, v);
-                    break;
-                case symtype.T_REAL:
-                    this.evaluateReal(q, input, v);
-                    break;
-                case symtype.T_COMPLEX:
-                    this.evaluateComplex(q, input, v);
-                    break;
-                case symtype.T_FUNCTION:
-                    this.evaluateFunction(q, input, v);
-                    break;
-                case symtype.T_STRING_LIST:
-                    this.evaluateStringList(q, input, v);
-                    break;
-                case symtype.T_SET:
-                case symtype.T_COMPLEX_SET:
-                    this.evaluateSet(q, input, v);
-                    break;
-                case symtype.T_MATRIX:
-                case symtype.T_MATRIX_OF_FUNCTIONS:
-                    this.evaluateMatrix(
-                        v.type == symtype.T_MATRIX_OF_FUNCTIONS,
-                        q, input, v);
-                    break;
-                case symtype.T_PROGRAMMING:
-                    input.evaluationInProgress = true;
-                    this.evaluateProgramming(q, input, v);
-                    break;
-                default:
-                    sellassert(false, "evaluate(): unimplemented math type: " + v.type.toString());
-            }
-        }
-        if(this.questionContainsSingleChoice && this.selectedAnySingleChoiceOption == false) {
-            q.generalFeedbackStr += GET_STR("no_answer_selected", this.p.language);
-        }
-        if(!this.allMultipleChoiceAnswersAreCorrect) {
-            q.generalFeedbackStr += GET_STR("not_yet_correct", this.p.language);
-        }
-        return true;
-    }*/
+  evaluate(): boolean {
+    this.selectedAnySingleChoiceOption = false;
+    this.questionContainsSingleChoice = false;
+    const q = this.p.q;
+    if (q == null) return false;
+    this.checkIfAllMultipleChoiceAnswersAreCorrect(q);
+    q.generalFeedbackStr = '';
+    q.allAnswersCorrect = true;
+    for (let i = 0; i < q.inputs.length; i++) {
+      const input = q.inputs[i];
+      const v = q.solutionSymbols[input.solutionVariableId];
+      sellassert(
+        v != null,
+        'evaluate(): unknown solution symbol ' +
+          input.solutionVariableId +
+          ' known solution symbols: ' +
+          JSON.stringify(q.solutionSymbols),
+      );
+      //input.evaluationInProgress = false;
+      switch (v.type) {
+        case symtype.T_BOOL:
+          this.evaluateBool(q, input, v);
+          break;
+        case symtype.T_REAL:
+          this.evaluateReal(q, input, v);
+          break;
+        case symtype.T_COMPLEX:
+          this.evaluateComplex(q, input, v);
+          break;
+        case symtype.T_FUNCTION:
+          this.evaluateFunction(q, input, v);
+          break;
+        case symtype.T_STRING_LIST:
+          this.evaluateStringList(q, input, v);
+          break;
+        case symtype.T_SET:
+        case symtype.T_COMPLEX_SET:
+          this.evaluateSet(q, input, v);
+          break;
+        case symtype.T_MATRIX:
+        case symtype.T_MATRIX_OF_FUNCTIONS:
+          /*this.evaluateMatrix(
+            v.type == symtype.T_MATRIX_OF_FUNCTIONS,
+            q,
+            input,
+            v,
+          );*/
+          // !!!!TODO!!!!!
+          break;
+        case symtype.T_PROGRAMMING:
+          //input.evaluationInProgress = true;
+          //this.evaluateProgramming(q, input, v);
+          // !!!!TODO!!!!!
+          break;
+        default:
+          sellassert(
+            false,
+            'evaluate(): unimplemented math type: ' + v.type.toString(),
+          );
+      }
+    }
+    if (
+      this.questionContainsSingleChoice &&
+      this.selectedAnySingleChoiceOption == false
+    ) {
+      q.generalFeedbackStr += GET_STR('no_answer_selected', this.p.language);
+    }
+    if (!this.allMultipleChoiceAnswersAreCorrect) {
+      q.generalFeedbackStr += GET_STR('not_yet_correct', this.p.language);
+    }
+    return true;
+  }
 
   /*isEvaluationReady(qidx : number) : boolean {
         const q = this.p.questions[qidx];
