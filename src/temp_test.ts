@@ -57,5 +57,9 @@ sellCode = `Addition
 
 Calculate $a + b = #c$`;
 
-question = index.createQuestion(sellCode);  // THROWS ERROR (AS EXPECTED)!!
-console.log(question);
+try {
+  question = index.createQuestion(sellCode);  // THROWS ERROR (AS EXPECTED)!!
+  console.log(question);
+} catch(error) {
+  console.log("... fails as expected!");
+}
