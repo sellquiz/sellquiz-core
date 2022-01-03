@@ -52,12 +52,12 @@ export class ParseIM {
   }
 
   // im_list =
-  //   im_assign { (","|":"|"->"|"|->") } im_assign;
+  //   im_assign { (","|"."|":"|"->"|"|->") } im_assign;
   parseIM_List() {
     let html = this.parseIM_Assign();
-    //    comma           colon           right arrow      maps to
     while (
       this.p.is(',') ||
+      this.p.is('.') ||
       this.p.is(':') ||
       this.p.is('->') ||
       this.p.is('|->')
