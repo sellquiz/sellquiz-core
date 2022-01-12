@@ -52,11 +52,11 @@ export class ParseIM {
         if(ch === '`') {
           parsingMath = !parsingMath;
           if(!parsingMath)
-            htmlConverted += AMTparseAMtoTeX(mathToken) + '`';
+            htmlConverted += '`' + AMTparseAMtoTeX(mathToken) + '`';
         }
         else if(!parsingMath)
           htmlConverted += ch;
-        if(parsingMath)
+        if(parsingMath && ch !=='`')
           mathToken += ch;
       }
       html = htmlConverted;
