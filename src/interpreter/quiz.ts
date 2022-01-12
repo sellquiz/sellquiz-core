@@ -103,6 +103,7 @@ export class SellQuiz {
   ELEMENT_TYPE_SPAN = 'span';
 
   // preferences
+  latexMode = false;
   debug = false;
   log = '';
   language = 'en';

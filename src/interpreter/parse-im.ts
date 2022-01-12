@@ -18,6 +18,8 @@
 
 // im := inline math
 
+import AMTparseAMtoTeX from 'asciimath-to-latex';
+
 import * as LinAlg from './../math/linalg';
 import { symtype, SellSymbol } from './symbol';
 import { SellQuiz } from './quiz';
@@ -38,11 +40,29 @@ export class ParseIM {
     while (!this.p.is('$') && !this.p.is('§END')) html += this.parseIM_Expr();
     html += '` ';
     this.p.terminal('$');
-    //this.p.q.html += ' <span style="font-size: 13pt;">' + html.replaceAll('``', '') + '</span> ';
-    //this.p.q.html +=
-    //  ' <span style="font-size: 13pt;">' + html.replace(/``/g, '') + '</span> ';
-    // TODO: font-size!!!
-    this.p.q.html += html.replace(/``/g, '');
+    html = html.replace(/``/g, ''); // input elements are excluded
+
+    if(this.p.latexMode) {
+      let htmlConverted = ''; // output := LaTeX
+      let mathToken='';
+      let parsingMath = false; // currently inside a pair of "`"?
+      const n = html.length;
+      for(let i=0; i<n; i++) {
+        const ch = html[i];
+        if(ch === '`') {
+          parsingMath = !parsingMath;
+          if(!parsingMath)
+            htmlConverted += AMTparseAMtoTeX(mathToken) + '`';
+        }
+        else if(!parsingMath)
+          htmlConverted += ch;
+        if(parsingMath)
+          mathToken += ch;
+      }
+      html = htmlConverted;
+    }
+
+    this.p.q.html += html;
   }
 
   // im_expr =  /*similar to ASCII math*/

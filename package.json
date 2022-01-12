@@ -23,6 +23,7 @@
   },
   "homepage": "https://github.com/sellquiz/sellquiz-core#readme",
   "dependencies": {
+    "asciimath-to-latex": "^0.5.1",
     "mathjs": "^10.0.2"
   },
   "devDependencies": {
