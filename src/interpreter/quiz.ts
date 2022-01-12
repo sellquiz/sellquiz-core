@@ -25,7 +25,16 @@ import { ParseIM } from './parse-im';
 import { ParseIM_Input } from './parse-im-input';
 import { ParseProg } from './parse-prog';
 import { Evaluate } from './../eval/evaluate';
-import { Variable, VariableType, Input, InputType, Answer, Feedback, FeedbackItem } from '../types';
+import {
+  Variable,
+  VariableType,
+  Input,
+  InputType,
+  Answer,
+  Feedback,
+  FeedbackItem,
+  QuizOptions,
+} from '../types';
 //import { MatrixInput } from './matinput';
 //import { getHtmlChildElementRecursive } from './help';
 //import { check_symbol_svg } from './img'
