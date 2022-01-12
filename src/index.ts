@@ -1,20 +1,27 @@
-import { Answer, Feedback, Question, QuestionWithAnswers, VariableType } from './types';
-
 import { SellQuiz } from './interpreter/quiz';
+import {
+  Answer,
+  Feedback,
+  Question,
+  QuestionWithAnswers,
+  QuizOptions,
+} from './types';
 
 /**
  * Creates a new question from sellCode
  * @param sellCode
  * @returns Question without answers
  */
-export function createQuestion(sellCode: string): Question {
-
+export function createQuestion(
+  sellCode: string,
+  options?: QuizOptions,
+): Question {
   console.log(sellCode);
 
   // TODO: generate question from sellcode
 
-  const sellQuiz = new SellQuiz();   // TODO: create instance here??
-  if(sellQuiz.importQuestion(sellCode) == false) {
+  const sellQuiz = new SellQuiz(); // TODO: create instance here??
+  if (sellQuiz.importQuestion(sellCode, options) == false) {
     throw new Error('import failed');
   }
   const question: Question = {
@@ -22,9 +29,8 @@ export function createQuestion(sellCode: string): Question {
     body: sellQuiz.getBodyHtml(),
     code: sellQuiz.getSellCode(),
     variables: sellQuiz.getVariables(),
-    inputs: sellQuiz.getInputs()
-  }
-
+    inputs: sellQuiz.getInputs(),
+  };
 
   /* example:
     const sellQuestion = sell.parse(sellcode);
@@ -57,13 +63,12 @@ export function getCalculatedAnswers(question: Question): Answer[] {
   console.log('Get calculated answers for: ', question.title);
   //const answers: Answer[] = [{ name: 'a', value: '1' }];
   const answers: Answer[] = [];
-  for(const v of question.variables) {
-    if(v.name.startsWith('$$') == false)
-      continue;
+  for (const v of question.variables) {
+    if (v.name.startsWith('$$') == false) continue;
     answers.push({
       name: v.name,
-      value: v.value
-    })
+      value: v.value,
+    });
   }
   return answers;
 }
@@ -90,25 +95,25 @@ export function evaluateQuestion(question: QuestionWithAnswers): Feedback {
     throw new Error('No answer given');
   }
 
-  const sellQuiz = new SellQuiz();   // TODO: create instance here??
+  const sellQuiz = new SellQuiz(); // TODO: create instance here??
 
   ///* example:
-    //const sellQuestion = sellQuiz.fromQuestion(question); // We expect that this question has answers
+  //const sellQuestion = sellQuiz.fromQuestion(question); // We expect that this question has answers
 
-    sellQuiz.setTitle(question.title);
-    sellQuiz.setBodyHtml(question.body);
-    if(!sellQuiz.setVariables(question.variables)) {
-      throw new Error('Failed to set variables');
-    }
-    if(!sellQuiz.setInputs(question.inputs)) {
-      throw new Error('Failed to set inputs');
-    }
-    sellQuiz.setSellCode(question.code);
-    if(!sellQuiz.setStudentAnswers(question.answers)) {
-      throw new Error('Failed to set student answers');
-    }
+  sellQuiz.setTitle(question.title);
+  sellQuiz.setBodyHtml(question.body);
+  if (!sellQuiz.setVariables(question.variables)) {
+    throw new Error('Failed to set variables');
+  }
+  if (!sellQuiz.setInputs(question.inputs)) {
+    throw new Error('Failed to set inputs');
+  }
+  sellQuiz.setSellCode(question.code);
+  if (!sellQuiz.setStudentAnswers(question.answers)) {
+    throw new Error('Failed to set student answers');
+  }
 
-    const feedback = sellQuiz.eval();
+  const feedback = sellQuiz.eval();
   //*/
 
   //const result = 0.42;

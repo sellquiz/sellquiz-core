@@ -9,7 +9,10 @@ let sellCode = `Addition
 
 Calculate $a + b = #c$`;
 
-let question = index.createQuestion(sellCode);
+let question = index.createQuestion(sellCode, { latex: true });
+console.log(question);
+
+question = index.createQuestion(sellCode, { latex: false });
 console.log(question);
 
 // case (a)

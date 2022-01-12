@@ -332,7 +332,9 @@ export class SellQuiz {
         console.log("ERROR: Obviously your quiz includes a programming task. Please also include sellquiz.ide.min.js in your HTML file");
     }*/
 
-  importQuestion(src: string, codeStartRow = 0): boolean {
+  importQuestion(src: string, params?: QuizOptions): boolean {
+    const { latex = false, codeStartRow = 0 } = params;
+    this.latexMode = latex;
 
     this.resizableRows = false;
     this.resizableCols = false;
