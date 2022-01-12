@@ -50,3 +50,8 @@ export interface FeedbackItem {
   inputName: string;
   text: string;
 }
+
+export interface QuizOptions {
+  latex?: boolean;
+  codeStartRow?: number;
+}

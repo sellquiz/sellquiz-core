@@ -25,7 +25,16 @@ import { ParseIM } from './parse-im';
 import { ParseIM_Input } from './parse-im-input';
 import { ParseProg } from './parse-prog';
 import { Evaluate } from './../eval/evaluate';
-import { Variable, VariableType, Input, InputType, Answer, Feedback, FeedbackItem } from '../types';
+import {
+  Variable,
+  VariableType,
+  Input,
+  InputType,
+  Answer,
+  Feedback,
+  FeedbackItem,
+  QuizOptions,
+} from '../types';
 //import { MatrixInput } from './matinput';
 //import { getHtmlChildElementRecursive } from './help';
 //import { check_symbol_svg } from './img'
@@ -332,7 +341,9 @@ export class SellQuiz {
         console.log("ERROR: Obviously your quiz includes a programming task. Please also include sellquiz.ide.min.js in your HTML file");
     }*/
 
-  importQuestion(src: string, codeStartRow = 0): boolean {
+  importQuestion(src: string, params?: QuizOptions): boolean {
+    const { latex = false, codeStartRow = 0 } = params;
+    this.latexMode = latex;
 
     this.resizableRows = false;
     this.resizableCols = false;
