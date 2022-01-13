@@ -1,6 +1,5 @@
 {
-    "cSpell.words": [
-        "asciimath",
-        "sellquiz"
-    ]
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.formatOnSave": true,
+  "cSpell.words": ["asciimath", "sellquiz"]
 }

@@ -88,10 +88,9 @@ export class SellQuestion {
   allAnswersCorrect = false;
   // TODO: move parse method and other methods here
 
-  getInput(name: string) : SellInput {
-    for(const input of this.inputs) {
-      if(input.solutionVariableId === name)
-        return input;
+  getInput(name: string): SellInput {
+    for (const input of this.inputs) {
+      if (input.solutionVariableId === name) return input;
     }
     return null;
   }
@@ -113,6 +112,8 @@ export class SellQuiz {
 
   // preferences
   latexMode = false;
+  inlineMathStartDelimiter = '`'; // or '(\' or '<span class="math">' or '[tex]' or ...
+  inlineMathEndDelimiter = '`'; // or '\)' or '</span>' or '[/tex]' or ...
   debug = false;
   log = '';
   language = 'en';
@@ -171,43 +172,43 @@ export class SellQuiz {
     this.q = new SellQuestion();
   }
 
-  getTitle() : string {
+  getTitle(): string {
     return this.q.titleHtml;
   }
 
-  setTitle(title : string) {
+  setTitle(title: string) {
     this.q.titleHtml = title;
   }
 
-  getSellCode() : string {
+  getSellCode(): string {
     return this.q.src;
   }
 
-  setSellCode(code : string) {
+  setSellCode(code: string) {
     this.q.src = code;
   }
 
-  getBodyHtml() : string {
+  getBodyHtml(): string {
     return this.q.bodyHtml;
   }
 
-  setBodyHtml(bodyHtml : string) {
+  setBodyHtml(bodyHtml: string) {
     this.q.bodyHtml = bodyHtml;
   }
 
-  getVariables() : Variable[] {
+  getVariables(): Variable[] {
     // TODO: precision!
-    const vars : Variable[] = [];
+    const vars: Variable[] = [];
 
     //const allSymbols = Object.assign({}, this.q.symbols, this.q.solutionSymbols);
     const allSymbols = this.q.symbols;
-    for(const symId in this.q.solutionSymbols) {
+    for (const symId in this.q.solutionSymbols) {
       allSymbols['$$' + symId] = this.q.solutionSymbols[symId];
     }
-    for(const symId in allSymbols) {
+    for (const symId in allSymbols) {
       const sym = allSymbols[symId];
-      let type : VariableType;
-      switch(sym.type) {
+      let type: VariableType;
+      switch (sym.type) {
         case symtype.T_REAL:
           type = VariableType.Scalar;
           break;
@@ -215,21 +216,21 @@ export class SellQuiz {
           // TODO!!
           type = VariableType.Unimplemented;
       }
-      const v : Variable = {
+      const v: Variable = {
         name: symId,
         type: type,
-        value: sym.toAsciiMath()
-      }
+        value: sym.toAsciiMath(),
+      };
       vars.push(v);
     }
     return vars;
   }
 
-  setVariables(vars : Variable[]) : boolean {
+  setVariables(vars: Variable[]): boolean {
     // TODO: precision!
-    for(const v of vars) {
-      let type : symtype;
-      switch(v.type) {
+    for (const v of vars) {
+      let type: symtype;
+      switch (v.type) {
         case VariableType.Boolean:
           type = symtype.T_BOOL;
           break;
@@ -240,7 +241,7 @@ export class SellQuiz {
           // TODO!!
           return false;
       }
-      if(v.name.startsWith('$$')) {
+      if (v.name.startsWith('$$')) {
         const name = v.name.substring(2);
         this.q.solutionSymbols[name] = new SellSymbol(type);
         this.q.solutionSymbols[name].fromAsciiMath(v.value);
@@ -252,11 +253,11 @@ export class SellQuiz {
     return true;
   }
 
-  getInputs() : Input[] {
-    const inputs : Input[] = [];
-    for(const sellInput of this.q.inputs) {
-      let type : InputType;
-      switch(sellInput.htmlElementInputType) {
+  getInputs(): Input[] {
+    const inputs: Input[] = [];
+    for (const sellInput of this.q.inputs) {
+      let type: InputType;
+      switch (sellInput.htmlElementInputType) {
         case SellInputElementType.CHECKBOX:
           type = InputType.Checkbox;
           break;
@@ -267,27 +268,26 @@ export class SellQuiz {
           // TODO!!
           type = InputType.Unimplemented;
       }
-      const input : Input = {
+      const input: Input = {
         name: '$$' + sellInput.solutionVariableId,
         type: type,
-        width: -1  // TODO
-      }
+        width: -1, // TODO
+      };
       inputs.push(input);
     }
     return inputs;
   }
 
-  setInputs(inputs : Input[]) : boolean {
-    for(const input of inputs) {
+  setInputs(inputs: Input[]): boolean {
+    for (const input of inputs) {
       const sellInput = new SellInput();
       const name = input.name.substring(2); // remove preceding '$$'
       sellInput.solutionVariableId = name;
-      if(!(name in this.q.solutionSymbols))
-        return false;
+      if (!(name in this.q.solutionSymbols)) return false;
       sellInput.solutionVariableRef = this.q.solutionSymbols[name];
       this.q.inputs.push(sellInput);
-      let type : SellInputElementType;
-      switch(input.type) {
+      let type: SellInputElementType;
+      switch (input.type) {
         case InputType.Checkbox:
           type = SellInputElementType.CHECKBOX;
           break;
@@ -303,33 +303,32 @@ export class SellQuiz {
     return true;
   }
 
-  setStudentAnswers(answers : Answer[]) : boolean {
-    for(const answer of answers) {
+  setStudentAnswers(answers: Answer[]): boolean {
+    for (const answer of answers) {
       const input = this.q.getInput(answer.name.substring(2));
-      if(input == null)
-        return false;
-      input.studentAnswer = [ ''+answer.value ];
+      if (input == null) return false;
+      input.studentAnswer = ['' + answer.value];
     }
     return true;
   }
 
-  eval() : Feedback {
-    if(!this.evaluate.evaluate()) {
-      throw new Error("failed to evaluate");
+  eval(): Feedback {
+    if (!this.evaluate.evaluate()) {
+      throw new Error('failed to evaluate');
     }
-    const feedbackItems : FeedbackItem[] = [];
-    for(const input of this.q.inputs) {
-      const feedbackItem : FeedbackItem = {
+    const feedbackItems: FeedbackItem[] = [];
+    for (const input of this.q.inputs) {
+      const feedbackItem: FeedbackItem = {
         inputName: '$$' + input.solutionVariableId,
-        text: input.evaluationFeedbackStr
-      }
+        text: input.evaluationFeedbackStr,
+      };
       feedbackItems.push(feedbackItem);
     }
     const score = this.evaluate.getScore();
-    const feedback : Feedback = {
+    const feedback: Feedback = {
       score: score,
-      items: feedbackItems
-    }
+      items: feedbackItems,
+    };
     return feedback;
   }
 

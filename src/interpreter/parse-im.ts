@@ -42,22 +42,30 @@ export class ParseIM {
     this.p.terminal('$');
     html = html.replace(/``/g, ''); // input elements are excluded
 
-    if(this.p.latexMode) {
+    if (
+      this.p.latexMode ||
+      this.p.inlineMathStartDelimiter !== '`' ||
+      this.p.inlineMathEndDelimiter !== '`'
+    ) {
       let htmlConverted = ''; // output := LaTeX
-      let mathToken='';
+      let mathToken = '';
       let parsingMath = false; // currently inside a pair of "`"?
       const n = html.length;
-      for(let i=0; i<n; i++) {
+      for (let i = 0; i < n; i++) {
         const ch = html[i];
-        if(ch === '`') {
+        if (ch === '`') {
           parsingMath = !parsingMath;
-          if(!parsingMath)
-            htmlConverted += '`' + AMTparseAMtoTeX(mathToken) + '`';
-        }
-        else if(!parsingMath)
-          htmlConverted += ch;
-        if(parsingMath && ch !=='`')
-          mathToken += ch;
+          const convertedMathToken = this.p.latexMode
+            ? AMTparseAMtoTeX(mathToken)
+            : mathToken;
+          if (!parsingMath) {
+            htmlConverted +=
+              this.p.inlineMathStartDelimiter +
+              convertedMathToken +
+              this.p.inlineMathEndDelimiter;
+          }
+        } else if (!parsingMath) htmlConverted += ch;
+        if (parsingMath && ch !== '`') mathToken += ch;
       }
       html = htmlConverted;
     }
