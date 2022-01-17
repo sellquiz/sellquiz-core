@@ -79,9 +79,10 @@ export function getCalculatedAnswers(question: Question): Answer[] {
  */
 export function validate(sellCode: string): boolean {
   console.log('Validate Code: ', sellCode);
-  // TODO: validate sellCode
-
-  // Return boolean for now. In the future, we should return an error message
+  const sellQuiz = new SellQuiz();
+  if (sellQuiz.importQuestion(sellCode) === false) {
+    return false;
+  }
   return true;
 }
 

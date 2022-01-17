@@ -1,4 +1,4 @@
-import * as index from './index'
+import * as index from './index';
 import { Answer, QuestionWithAnswers } from './types';
 
 // simple question
@@ -16,41 +16,44 @@ question = index.createQuestion(sellCode, { latex: false });
 console.log(question);
 
 // case (a)
-console.log("case (a) assume an excellent student: 100 % correct!");
+console.log('case (a) assume an excellent student: 100 % correct!');
 let answers = index.getCalculatedAnswers(question);
-let questionWithAnswers : QuestionWithAnswers = {
+let questionWithAnswers: QuestionWithAnswers = {
   ...question,
-  answers: answers
-}
+  answers: answers,
+};
 let score = index.evaluateQuestion(questionWithAnswers);
 console.log(score);
 
 // case (b)
-console.log("case (b): assume total fail: 0 % correct...");
-answers = [{
-  name: '$$0',
-  value: "-1"
-}]
+console.log('case (b): assume total fail: 0 % correct...');
+answers = [
+  {
+    name: '$$0',
+    value: '-1',
+  },
+];
 questionWithAnswers = {
   ...question,
-  answers: answers
-}
+  answers: answers,
+};
 score = index.evaluateQuestion(questionWithAnswers);
 console.log(score);
 
 // case (c)
-console.log("case (c): assume syntax error by student");
-answers = [{
-  name: '$$0',
-  value: "x+0"
-}]
+console.log('case (c): assume syntax error by student');
+answers = [
+  {
+    name: '$$0',
+    value: 'x+0',
+  },
+];
 questionWithAnswers = {
   ...question,
-  answers: answers
-}
+  answers: answers,
+};
 score = index.evaluateQuestion(questionWithAnswers);
 console.log(score);
-
 
 // question with syntactic error
 sellCode = `Addition
@@ -61,8 +64,11 @@ sellCode = `Addition
 Calculate $a + b = #c$`;
 
 try {
-  question = index.createQuestion(sellCode);  // THROWS ERROR (AS EXPECTED)!!
+  question = index.createQuestion(sellCode); // THROWS ERROR (AS EXPECTED)!!
   console.log(question);
-} catch(error) {
-  console.log("... fails as expected!");
+} catch (error) {
+  console.log('... fails as expected!');
 }
+
+const isValid = index.validate(sellCode);
+console.log('Should be false:', isValid);
