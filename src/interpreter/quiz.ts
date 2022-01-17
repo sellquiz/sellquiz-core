@@ -34,6 +34,7 @@ import {
   Feedback,
   FeedbackItem,
   QuizOptions,
+  InlineMathDelimiter,
 } from '../types';
 //import { MatrixInput } from './matinput';
 //import { getHtmlChildElementRecursive } from './help';
@@ -341,8 +342,16 @@ export class SellQuiz {
     }*/
 
   importQuestion(src: string, params?: QuizOptions): boolean {
-    const { latex = false, codeStartRow = 0 } = params;
+    const {
+      latex = false,
+      codeStartRow = 0,
+      inlineMathStartDelimiter = InlineMathDelimiter.tick,
+      inlineMathEndDelimiter = InlineMathDelimiter.tick,
+    } = params;
     this.latexMode = latex;
+
+    this.inlineMathStartDelimiter = inlineMathStartDelimiter;
+    this.inlineMathEndDelimiter = inlineMathEndDelimiter;
 
     this.resizableRows = false;
     this.resizableCols = false;

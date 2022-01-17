@@ -2,14 +2,24 @@ export enum VariableType {
   Boolean = 'BOOLEAN',
   Scalar = 'SCALAR',
   Text = 'TEXT',
-  Unimplemented = 'UNIMPLEMENTED'
+  Unimplemented = 'UNIMPLEMENTED',
 }
 
 export enum InputType {
   Checkbox = 'CHECKBOX',
   Radiobutton = 'RADIOBUTTON',
   Textfield = 'TEXTFIELD',
-  Unimplemented = 'UNIMPLEMENTED'
+  Unimplemented = 'UNIMPLEMENTED',
+}
+
+export enum InlineMathDelimiter {
+  tick = '`',
+  backSlashStart = '\\(',
+  backSlashEnd = '\\)',
+  texStart = '[tex]',
+  texEnd = '[/tex]',
+  spanStart = '<span class = math>',
+  spanEnd = '</span>',
 }
 
 export interface Question {
@@ -38,7 +48,7 @@ export interface Answer {
 export interface Input {
   name: string;
   type: InputType;
-  width: -1;   // TODO: in pixels? yet unset
+  width: -1; // TODO: in pixels? yet unset
 }
 
 export interface Feedback {
@@ -54,4 +64,6 @@ export interface FeedbackItem {
 export interface QuizOptions {
   latex?: boolean;
   codeStartRow?: number;
+  inlineMathStartDelimiter?: InlineMathDelimiter;
+  inlineMathEndDelimiter?: InlineMathDelimiter;
 }
